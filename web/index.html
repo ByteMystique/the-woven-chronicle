@@ -1,13 +1,32 @@
 <!doctype html>
-<html lang="en">
+<html>
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>The Woven Chronicle</title>
   </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+  <body style="font-family:system-ui;margin:20px;max-width:800px">
+    <h1>The Woven Chronicle 🌪️</h1>
+
+    <section style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+      <input id="name" placeholder="your name (optional)" />
+      <input id="prompt" placeholder="add a sentence or idea..." style="flex:1"/>
+      <button id="send">Weave It</button>
+      <button id="twist">Twist Now</button>
+    </section>
+
+    <section style="margin:10px 0">
+      <label>Style:
+        <input id="style" value="cozy sci-fi mystery on a bus at night" style="width:360px"/>
+      </label>
+      <label style="margin-left:12px">Chaos:
+        <input id="temp" type="range" min="0.7" max="1.5" step="0.05" value="1.05"/>
+      </label>
+      <a href="/admin.html" style="margin-left:16px">admin</a>
+    </section>
+
+    <pre id="story" style="height:60vh;overflow:auto;white-space:pre-wrap;background:#0b0b0b;color:#f3f3f3;padding:12px;border-radius:8px"></pre>
+
+    <script type="module" src="/main.js"></script>
   </body>
 </html>
