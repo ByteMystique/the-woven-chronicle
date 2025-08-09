@@ -4,6 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>The Woven Chronicle</title>
+    <style>
+  :root { --bg:#0b0b0b; --fg:#f3f3f3; --muted:#9aa0a6; --accent:#7dd3fc; }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 16px; background:#fff; }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { margin: 8px 0 12px; letter-spacing:.2px }
+  .toolbar{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .toolbar input[type="text"]{ flex:1; min-width: 180px; }
+  .story {
+    height: 60vh; overflow:auto; white-space:pre-wrap;
+    background:var(--bg); color:var(--fg);
+    padding:14px 16px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.12);
+    line-height:1.45;
+  }
+  .pulse { animation:pulse .6s ease-out; }
+  @keyframes pulse { 0%{box-shadow:0 0 0 rgba(125,211,252, .8)} 100%{box-shadow:0 0 0 rgba(125,211,252,0)} }
+  @media (max-width:640px){ .story{height:55vh} }
+</style>
+
   </head>
   <body style="font-family:system-ui;margin:20px;max-width:800px">
     <h1>The Woven Chronicle 🌪️</h1>
