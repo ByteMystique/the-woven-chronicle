@@ -43,7 +43,7 @@ async function markDone(id, status) {
 
 // --- prompts (micro-chapter mode) ---
 function sysPrompt(style) {
-  return `Write a self-contained micro-chapter in EXACTLY 1–2 short sentences.
+  return `Continue the story in at least 3–4 sentences. Maintain the chaotic, humorous tone and unexpected twists.
 You MUST incorporate the audience phrase, either verbatim or by clearly referencing its meaning.
 Conclude this micro-chapter clearly (witty button or soft full stop).
 Avoid generic openings like "Once upon a time". Output ONLY the new sentences.
