@@ -80,9 +80,8 @@ Weave output for input-> "perfume"
 https://youtu.be/H7EEizcE8m8
 
 # Additional Demos
-    Live site: the-woven-chronicle.vercel.app
-
-    Repo: https://github.com/ByteMystique/the-woven-chronicle
+Live site: https://the-woven-chronicle.vercel.app
+Repo: https://github.com/ByteMystique/the-woven-chronicle
 
 
 
