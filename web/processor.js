@@ -35,14 +35,26 @@ async function markDone(id, status){
 function sysPrompt(style) {
   return `You write an endless story in EXACTLY 1–2 short sentences per turn.
 You MUST incorporate the audience phrase, either verbatim or by clearly referencing its meaning.
-Do NOT conclude. Avoid generic openings like "Once upon a time". Output ONLY the new sentences.
+Do conclude the story. Avoid generic openings like "Once upon a time". Output ONLY the new sentences.
 Style: ${style}`;
 }
 function userPrompt(suggestion) {
-  const clean = String(suggestion).trim().replace(/\s+/g, " ");
+  const isTwist = suggestion === "[TWIST]";
   const ctxLine = tinyCtx ? `Previous: ${tinyCtx}\n` : "";
-  return `${ctxLine}Audience phrase: "${clean}"\nContinue the story now with 1–2 sentences that clearly use this phrase or its main idea.`;
+
+  if (isTwist) {
+    // Control message: force a scene jump; never print the word 'twist'
+    return `${ctxLine}Hard-cut to a wildly different scene or mood immediately. 
+Introduce a surprising location, character, or image. 
+Do NOT use or mention the word "twist". 
+Write EXACTLY 1–2 short sentences.`;
+  }
+
+  const clean = String(suggestion).trim().replace(/\s+/g, " ");
+  return `${ctxLine}Audience phrase: "${clean}"
+Continue the story now with 1–2 sentences that clearly use this phrase or its main idea.`;
 }
+
 function phraseKeyTokens(suggestion){
   return suggestion.toLowerCase().match(/[a-z]{4,}/g)?.slice(0,4) || [];
 }
