@@ -5,34 +5,6 @@ const sb = createClient(
   import.meta.env.VITE_SUPABASE_ANON
 );
 
-let peerCtrl = null;
-
-const statusEl = document.getElementById("peer-status");
-function setStatus(s){ if(statusEl) statusEl.textContent = s; }
-
-const toggle = document.getElementById("peer-toggle");
-toggle.addEventListener("change", async (e)=>{
-  if (e.target.checked) {
-    if (!peerCtrl) {
-      const mod = await import("./peer-processor.js");
-      peerCtrl = mod.startPeerWeaver(
-        sb,
-        () => ({ style: el.style.value, temp: parseFloat(el.temp.value || "1.0") }),
-        setStatus
-      );
-    }
-    peerCtrl.start();
-  } else {
-    peerCtrl?.stop();
-    setStatus("");
-  }
-});
-
-// Optional: remember the user’s choice
-toggle.checked = JSON.parse(localStorage.getItem("peer-on") || "false");
-toggle.onchange = (e)=> localStorage.setItem("peer-on", String(e.target.checked));
-if (toggle.checked) toggle.dispatchEvent(new Event("change"));
-
 const el = {
   story:  document.getElementById("story"),
   prompt: document.getElementById("prompt"),
@@ -63,7 +35,7 @@ const audio = {
 };
 
 function revealAppend(target, text){
-  // fast typewriter: 3 chars per frame
+  // fast typewriter: ~3 chars per frame
   let i = 0;
   (function tick(){
     const slice = text.slice(i, i+3);
@@ -75,37 +47,41 @@ function revealAppend(target, text){
       requestAnimationFrame(tick);
     }
   })();
-  // pulse ring (if you added .pulse CSS)
   target.classList.remove("pulse"); void target.offsetWidth; target.classList.add("pulse");
 }
 
-// ---------------- Add dice + mute controls (no HTML changes needed) -----
+// ---------------- Add dice + mute controls (styled to align) ------------
 (function addExtras(){
-  // 🎲 button
+  // 🎲 button styled like other buttons
   const dice = document.createElement("button");
-  dice.id = "dice"; dice.textContent = "🎲";
+  dice.id = "dice";
+  dice.className = "btn secondary";
+  dice.textContent = "Random 🎲";
   dice.title = "random prompt";
   const seeds = [
-    "the bus grows legs", "time glitches for 6 seconds", "a cat made of steam",
-    "an elf with a calculator", "gravity misbehaves", "the moon forgets its name"
+    "the bus grows legs","time glitches for 6 seconds","a cat made of steam",
+    "an elf with a calculator","gravity misbehaves","the moon forgets its name"
   ];
   dice.onclick = ()=>{ el.prompt.value = seeds[Math.floor(Math.random()*seeds.length)]; el.prompt.focus(); };
 
-  // mute toggle
+  // mute toggle styled like other toggles
   const muteWrap = document.createElement("label");
-  muteWrap.style.display = "flex"; muteWrap.style.alignItems = "center"; muteWrap.style.gap = "6px";
-  const mute = document.createElement("input"); mute.type = "checkbox"; mute.id = "mute"; mute.checked = audio.muted;
+  muteWrap.className = "toggle";
+  const mute = document.createElement("input");
+  mute.type = "checkbox";
+  mute.id = "mute";
+  mute.checked = audio.muted;
   mute.onchange = (e)=>{ audio.muted = e.target.checked; localStorage.setItem("muted", String(audio.muted)); };
   muteWrap.appendChild(mute);
   muteWrap.appendChild(document.createTextNode("mute"));
 
-  // drop them right after Send
+  // insert both RIGHT AFTER the Weave button
   el.send.parentNode?.insertBefore(dice, el.send.nextSibling);
   el.send.parentNode?.insertBefore(muteWrap, dice.nextSibling);
 })();
 
 // ---------------- Persist style & temp per viewer -----------------------
-el.style.value = localStorage.getItem("style") || "";        // start EMPTY by default
+el.style.value = localStorage.getItem("style") || "";  // start EMPTY by default
 el.temp.value  = localStorage.getItem("temp")  || "1.0";
 el.style.addEventListener("input", ()=> localStorage.setItem("style", el.style.value));
 el.temp.addEventListener("input",  ()=> localStorage.setItem("temp",  el.temp.value));
@@ -153,6 +129,7 @@ el.twist.onclick = async () => {
 // ---------------- Download transcript button ----------------------------
 const dl = document.createElement("button");
 dl.textContent = "Download .txt";
+dl.className = "btn secondary"; // match styling
 dl.style.marginTop = "10px";
 dl.onclick = () => {
   const blob = new Blob([el.story.textContent], {type:"text/plain"});
@@ -162,6 +139,35 @@ dl.onclick = () => {
   a.click();
 };
 document.body.appendChild(dl);
+
+// ---------------- Peer weaver toggle (moved below `el`) -----------------
+let peerCtrl = null;
+
+const statusEl = document.getElementById("peer-status");
+function setStatus(s){ if(statusEl) statusEl.textContent = s; }
+
+const toggle = document.getElementById("peer-toggle");
+toggle.addEventListener("change", async (e)=>{
+  if (e.target.checked) {
+    if (!peerCtrl) {
+      const mod = await import("./peer-processor.js");
+      peerCtrl = mod.startPeerWeaver(
+        sb,
+        () => ({ style: el.style.value, temp: parseFloat(el.temp.value || "1.0") }),
+        setStatus
+      );
+    }
+    peerCtrl.start();
+  } else {
+    peerCtrl?.stop();
+    setStatus("");
+  }
+});
+
+// remember user choice
+toggle.checked = JSON.parse(localStorage.getItem("peer-on") || "false");
+toggle.onchange = (e)=> localStorage.setItem("peer-on", String(e.target.checked));
+if (toggle.checked) toggle.dispatchEvent(new Event("change"));
 
 // ---------------- Expose controls for legacy admin (optional) ----------
 window.__getControls = () => ({

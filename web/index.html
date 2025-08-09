@@ -1,56 +1,351 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>The Woven Chronicle</title>
-    <style>
-  :root { --bg:#0b0b0b; --fg:#f3f3f3; --muted:#9aa0a6; --accent:#7dd3fc; }
-  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 16px; background:#fff; }
-  .wrap { max-width: 900px; margin: 0 auto; }
-  h1 { margin: 8px 0 12px; letter-spacing:.2px }
-  .toolbar{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .toolbar input[type="text"]{ flex:1; min-width: 180px; }
-  .story {
-    height: 60vh; overflow:auto; white-space:pre-wrap;
-    background:var(--bg); color:var(--fg);
-    padding:14px 16px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.12);
-    line-height:1.45;
-  }
-  .pulse { animation:pulse .6s ease-out; }
-  @keyframes pulse { 0%{box-shadow:0 0 0 rgba(125,211,252, .8)} 100%{box-shadow:0 0 0 rgba(125,211,252,0)} }
-  @media (max-width:640px){ .story{height:55vh} }
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Woven Chronicle</title>
+
+  <style>
+    :root{
+      --bg: #0b0d12;
+      --card: #0f1218;
+      --ink: #e8f0ff;
+      --muted: #98a2b3;
+      --ring: #7dd3fc;
+      --brand1: #60a5fa;
+      --brand2: #a78bfa;
+      --btn: #161b22;
+      --btn-text: #f8fafc;
+      --border: rgba(255,255,255,.08);
+    }
+    *{ box-sizing: border-box; }
+    html, body{ height:100%; }
+    body{
+      margin:0;
+      font:15px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+      color:#0b1220;
+      background:
+        radial-gradient(1200px 800px at 10% -10%, rgba(96,165,250,.25), transparent 60%),
+        radial-gradient(1200px 800px at 110% 10%, rgba(167,139,250,.22), transparent 55%),
+        #0b0d12;
+    }
+    .wrap{ max-width: 1100px; margin:0 auto; padding:18px; }
+
+    /* Header */
+    .top{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; margin-bottom:14px; color: var(--ink);
+    }
+    h1{
+      margin:0; font-weight:900; letter-spacing:.2px; display:flex; align-items:center; gap:12px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius:10px;
+      display:inline-grid; place-items:center;
+      color:#fff; font-weight:900;
+      background: linear-gradient(135deg, var(--brand1), var(--brand2));
+      box-shadow: 0 8px 30px rgba(96,165,250,.25);
+    }
+    .subtitle{ color:var(--muted); font-size:13px; }
+
+    /* Toolbar (sticky, glassy) */
+    .toolbar{
+      position: sticky; top:0; z-index:10;
+      display:grid; gap:10px;
+      grid-template-columns: 1fr auto auto;
+      padding:12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: color-mix(in srgb, #0f141d 70%, transparent);
+      backdrop-filter: blur(10px) saturate(120%);
+      box-shadow: 0 10px 40px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .toolbar .row{
+      display:grid; gap:10px; grid-template-columns: 1fr 1fr auto auto;
+    }
+    .toolbar .row2{
+      display:grid; gap:10px; grid-template-columns: 1fr auto 1fr; align-items:center;
+    }
+    @media (max-width: 860px){
+      .toolbar{ grid-template-columns: 1fr; }
+      .toolbar .row{ grid-template-columns: 1fr 1fr; }
+      .toolbar .row2{ grid-template-columns: 1fr 1fr; }
+      .hide-sm{ display:none; }
+    }
+
+    input[type="text"]{
+      width:100%; height:40px; padding:10px 12px; border-radius:12px;
+      border:1px solid var(--border); color:var(--ink); background:#0d1117;
+      outline:none;
+    }
+    input[type="text"]::placeholder{ color:#6b7280; }
+    input[type="text"]:focus{
+      border-color:var(--ring);
+      box-shadow:0 0 0 3px color-mix(in srgb, var(--ring) 28%, transparent);
+    }
+
+    .btn{
+      appearance:none; border:1px solid #111827; background:var(--btn); color:var(--btn-text);
+      padding:10px 14px; height:40px; border-radius:12px; font-weight:700; cursor:pointer;
+      display:inline-flex; align-items:center; gap:8px; white-space:nowrap;
+      transition: transform .04s ease, box-shadow .2s ease;
+      box-shadow: 0 6px 18px rgba(0,0,0,.35);
+    }
+    .btn.secondary{ background:#0b1220; color:#dbeafe; border:1px solid var(--border); }
+    .btn:hover{ box-shadow: 0 10px 26px rgba(0,0,0,.45); }
+    .btn:active{ transform: translateY(1px); }
+    .toggle{ display:flex; align-items:center; gap:8px; color:var(--ink); white-space:nowrap; }
+
+    /* Story panel */
+    .story{
+      margin-top:14px;
+      height: 64vh;
+      background: #0b0f16;
+      color: #e8f0ff;
+      border-radius:16px;
+      padding:18px 20px;
+      white-space: pre-wrap;
+      overflow:auto;
+      font: 14.5px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.03),
+        0 20px 60px rgba(0,0,0,.35);
+    }
+    @media (max-width:720px){ .story{ height:60vh; } }
+
+    /* Pulse on new text */
+    .pulse{ animation:pulse .55s ease-out; }
+    @keyframes pulse{
+      from{ box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 0 0 0 rgba(96,165,250,.35) }
+      to{   box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 0 0 16px rgba(96,165,250,0) }
+    }
+
+    .muted{ color:var(--muted); font-size:12px; }
+    .foot{ display:flex; align-items:center; gap:12px; margin-top:10px; color:var(--ink); }
+    a.link{ color:#c7d2fe; text-decoration:none; }
+    a.link:hover{ text-decoration:underline; }
+  
+  /* layout + alignment fix */
+.toolbar{
+  position: sticky; top: 0; z-index: 10;
+  display: grid; gap: 10px;
+  grid-template-columns: 1fr;
+  padding: 12px; border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  background: color-mix(in srgb, #0f141d 70%, transparent);
+  backdrop-filter: blur(10px) saturate(120%);
+  box-shadow: 0 10px 40px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.04);
+}
+.row{ display: grid; gap: 10px; }
+.row-1{
+  grid-template-columns: 220px 1fr auto auto;
+  align-items: center;
+}
+.row-2{
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+}
+.row-2 .right{
+  display: inline-flex; align-items: center; gap: 12px; justify-self: end;
+}
+
+input[type="text"], .btn, .toggle{ height: 40px; }
+input[type="text"]{
+  padding: 10px 12px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.08); color: var(--fg);
+  background: #0d1117; outline: none;
+}
+input[type="text"]::placeholder{ color:#6b7280; }
+input[type="text"]:focus{ border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent); }
+
+.btn{
+  appearance:none; border:1px solid #111827; background:#161b22; color:#f8fafc;
+  padding:10px 14px; border-radius:12px; font-weight:700; cursor:pointer;
+  display:inline-flex; align-items:center; gap:8px; white-space:nowrap;
+}
+.btn.secondary{ background:#0b1220; color:#dbeafe; border:1px solid rgba(255,255,255,.08); }
+
+.toggle{ display:flex; align-items:center; gap:8px; color: var(--fg); }
+.label{ color:#9aa0a6; font-size:12px; }
+
+/* make it stack nicely on phones */
+@media (max-width: 860px){
+  .row-1{ grid-template-columns: 1fr 1fr auto auto; }
+  .row-2{ grid-template-columns: 1fr 1fr; }
+  .row-2 .right{ grid-column: 1 / -1; justify-self: start; }
+}
+@media (max-width: 540px){
+  .row-1{ grid-template-columns: 1fr; }
+  .row-2{ grid-template-columns: 1fr; }
+}
+/* widen the page container */
+.wrap{
+  /* grow on big screens but stay comfy on laptops */
+  width: min(1400px, 96vw);
+}
+
+/* make the toolbar not clip long labels (like "help weave…") */
+.toolbar{
+  overflow: visible;           /* was implicitly clipping */
+  padding: 12px 16px;          /* a tiny bit wider */
+}
+
+/* roomier grid so everything fits on one line where possible */
+.row-1{
+  /* name | prompt | weave | random */
+  grid-template-columns: minmax(220px, 300px) 1fr auto auto;
+}
+.row-2{
+  /* style | help-weave | status+chaos+admin cluster */
+  grid-template-columns: minmax(360px, 1fr) auto minmax(420px, 1fr);
+}
+
+/* keep the chaos slider from hogging space; scale nicely with viewport */
+#temp{
+  width: clamp(140px, 22vw, 260px);
+}
+
+/* tighten gaps a bit so we don’t wrap early */
+.row, .row-2 .right{ gap: 10px; }
+
+/* medium screens: allow neat wrapping without hiding anything */
+@media (max-width: 1100px){
+  .row-2{ grid-template-columns: 1fr 1fr; }
+  .row-2 .right{ grid-column: 1 / -1; justify-self: start; }
+}
+
+/* phones: stack cleanly */
+@media (max-width: 600px){
+  .row-1{ grid-template-columns: 1fr; }
+  .row-2{ grid-template-columns: 1fr; }
+}
+/* make input text visible on dark background */
+input[type="text"],
+input[type="search"],
+input[type="number"],
+input[type="range"],
+input[type="password"],
+textarea,
+select {
+  background-color: rgba(255,255,255,0.08); /* semi-transparent light bg */
+  color: #f5f5f5;                            /* light text */
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255,255,255,0.6); /* lighter placeholder so it’s distinct */
+}
+/* widen page so the toolbar has room */
+.wrap{
+  width: min(1280px, 96vw);
+}
+
+/* give the toolbar more breathing room and stop clipping */
+.toolbar{
+  overflow: visible;
+  padding: 12px 16px;
+}
+
+/* lay out rows so long labels fit */
+.row-1{ /* name | prompt | weave | random */
+  grid-template-columns: minmax(200px,280px) 1fr max-content max-content;
+  align-items: center;
+}
+.row-2{ /* style | help-weave toggle | right cluster */
+  grid-template-columns: minmax(360px,1fr) minmax(260px,max-content) max-content;
+  align-items: center;
+}
+
+/* ensure the toggle text is visible and cannot shrink away */
+.toolbar .toggle{
+  color: var(--ink) !important;
+  white-space: nowrap;
+  min-width: max-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.toolbar .toggle input[type="checkbox"]{ margin: 0; height: 18px; }
+
+/* right cluster (status • Chaos • slider • admin) keeps one line */
+.row-2 .right{
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+  min-width: 380px;
+}
+
+/* range width that scales with viewport but never huge */
+#temp{ width: clamp(140px, 24vw, 280px); }
+
+/* inputs: readable text on dark bg */
+input[type="text"],
+textarea, select{
+  background-color: rgba(255,255,255,0.08);
+  color: #f5f5f5;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+input::placeholder{ color: rgba(255,255,255,0.65); }
+
+/* responsive wrap rules */
+@media (max-width: 1100px){
+  .row-2{ grid-template-columns: 1fr 1fr; }
+  .row-2 .right{ grid-column: 1 / -1; justify-self: start; }
+}
+@media (max-width: 600px){
+  .row-1{ grid-template-columns: 1fr; }
+  .row-2{ grid-template-columns: 1fr; }
+}
+
 </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- header -->
+    <div class="top">
+      <div>
+        <h1><span class="logo">🧵</span> The Woven Chronicle</h1>
+        <div class="subtitle">An infinite, crowd-woven micro-novel. Your sentence becomes canon.</div>
+      </div>
+    </div>
 
-  </head>
-  <body style="font-family:system-ui;margin:20px;max-width:800px">
-    <h1>The Woven Chronicle 🌪️</h1>
+    <!-- toolbar -->
+    <div class="toolbar">
+  <!-- row 1 -->
+  <div class="row row-1">
+    <input id="name" type="text" placeholder="your name (optional)" />
+    <input id="prompt" type="text" placeholder="add a sentence or idea…" />
+    <button id="send" class="btn">Weave It</button>
+    <!-- dice + mute will be injected by main.js next to send -->
+    <button id="twist" class="btn secondary">Twist Now</button>
+  </div>
 
-    <section style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
-      <input id="name" placeholder="your name (optional)" />
-      <input id="prompt" placeholder="add a sentence or idea..." style="flex:1"/>
-      <button id="send">Weave It</button>
-      <button id="twist">Twist Now</button>
-      <label style="display:flex;align-items:center;gap:6px">
-  <input id="peer-toggle" type="checkbox" />
-  help weave with my browser
-</label>
-<span id="peer-status" style="font-size:12px;color:#666"></span>
+  <!-- row 2 -->
+  <div class="row row-2">
+    <input id="style" type="text" placeholder="Style (e.g., neon-noir haiku, cozy sci-fi…)" />
+    <label class="toggle"><input id="peer-toggle" type="checkbox" /> help weave with my browser</label>
+    <div class="right">
+      <span id="peer-status" class="muted">idle</span>
+      <span class="label">Chaos:</span>
+      <input id="temp" type="range" min="0.7" max="1.5" step="0.01" value="1.0" />
+      <a id="admin" href="#" class="link">admin</a>
+    </div>
+  </div>
+</div>
 
-    </section>
 
-    <section style="margin:10px 0">
-      <label>Style:
-        <input id="style" value="cozy sci-fi mystery on a bus at night" style="width:360px"/>
-      </label>
-      <label style="margin-left:12px">Chaos:
-        <input id="temp" type="range" min="0.7" max="1.5" step="0.05" value="1.05"/>
-      </label>
-      <a href="/admin.html" style="margin-left:16px">admin</a>
-    </section>
+    <!-- story -->
+    <div id="story" class="story" aria-live="polite"></div>
 
-    <pre id="story" style="height:60vh;overflow:auto;white-space:pre-wrap;background:#0b0b0b;color:#f3f3f3;padding:12px;border-radius:8px"></pre>
+    <div class="foot">
+      <span class="muted">Made by Jayadev Narayanan</span>
+    </div>
+  </div>
 
-    <script type="module" src="/main.js"></script>
-  </body>
+  <script type="module" src="/main.js"></script>
+</body>
 </html>
