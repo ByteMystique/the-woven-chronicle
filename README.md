@@ -4,7 +4,7 @@
 
 ## Basic Details
 
-### Team Name: WeaveMasters
+### Team Name: ByteMystique
 
 ### Team Members
 - Team Lead: Jayadev Narayanan – School of Engineering, CUSAT
@@ -42,7 +42,7 @@ Let strangers + a tiny on-device AI take turns deciding what happens next. No ru
 #### Installation
 ```bash
 # Clone the repo
-git clone <repo-link>
+git clone https://github.com/ByteMystique/the-woven-chronicle
 
 # Go into the project folder (web root if applicable)
 cd <folder-name>
