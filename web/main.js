@@ -5,6 +5,34 @@ const sb = createClient(
   import.meta.env.VITE_SUPABASE_ANON
 );
 
+let peerCtrl = null;
+
+const statusEl = document.getElementById("peer-status");
+function setStatus(s){ if(statusEl) statusEl.textContent = s; }
+
+const toggle = document.getElementById("peer-toggle");
+toggle.addEventListener("change", async (e)=>{
+  if (e.target.checked) {
+    if (!peerCtrl) {
+      const mod = await import("./peer-processor.js");
+      peerCtrl = mod.startPeerWeaver(
+        sb,
+        () => ({ style: el.style.value, temp: parseFloat(el.temp.value || "1.0") }),
+        setStatus
+      );
+    }
+    peerCtrl.start();
+  } else {
+    peerCtrl?.stop();
+    setStatus("");
+  }
+});
+
+// Optional: remember the user’s choice
+toggle.checked = JSON.parse(localStorage.getItem("peer-on") || "false");
+toggle.onchange = (e)=> localStorage.setItem("peer-on", String(e.target.checked));
+if (toggle.checked) toggle.dispatchEvent(new Event("change"));
+
 const el = {
   story:  document.getElementById("story"),
   prompt: document.getElementById("prompt"),
